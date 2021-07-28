@@ -16,12 +16,11 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class MovieController extends AbstractController
 {
-    public $omdbClient;
+    private $omdbClient;
 
-    public function __construct(HttpClientInterface $httpClient){
-      $apiKey = '28c5b7b1';
-      $omdbHost = 'https://www.omdbapi.com';
-      $this->omdbClient = new OmdbClient($httpClient, $apiKey, $omdbHost);
+    public function __construct(OmdbClient $omdbClient)
+    {
+      $this->omdbClient = $omdbClient;
     }
 
     /**
