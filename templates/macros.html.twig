@@ -9,6 +9,23 @@
         {{ review.rating }}
       </div>
       <p>{{ review.content }}</p>
+      <p>
+        {% if is_granted('REVIEW_EDIT', review)  %}
+          <a href="#">Edit</a>
+        {% endif %}
+        {% if is_granted('REVIEW_DELETE', review)  %}
+          | <a href="#">Delete</a>
+        {% endif %}
+      </p>
     </div>
   </div>
+{% endmacro %}
+
+{% macro login_section() %}
+  {% if app.user %}
+    <span style="color:#fff">Hi {{ app.user.firstName }} | <a href="{{ logout_path() }}">Logout</a> | last login {{ app.user.lastLoginAt() | date('d-m-Y H:i:s') }}</span>
+  {% else %}
+    <li class="nav-item active"><a class="nav-link" href="/user/cart" title="Register or log in"><i class="fas fa-shopping-bag"></i></a></li>
+    <li class="nav-item active"><a class="nav-link" href="/login" title="Register or log in"><i class="fas fa-user"></i></a></li>
+  {% endif %}
 {% endmacro %}

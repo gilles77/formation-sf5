@@ -1,16 +1,29 @@
 security:
     # https://symfony.com/doc/current/security/experimental_authenticators.html
     enable_authenticator_manager: true
+    password_hashers:
+        App\Entity\User:
+            algorithm: auto
+
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
-        users_in_memory: { memory: null }
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
+            pattern: ^/
             lazy: true
-            provider: users_in_memory
+            provider: app_user_provider
+            form_login: # bin/console config:dump security firewalls => LISTE TOUTES LES OPTIONS PAR DEFAUT
+                username_parameter: _email # doit être similaire au nom de la balise input pour l'email
+            logout: ~
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#firewalls-authentication
@@ -18,8 +31,17 @@ security:
             # https://symfony.com/doc/current/security/impersonating_user.html
             # switch_user: true
 
+    role_hierarchy:
+        ROLE_USER: ~
+        ROLE_MODERATOR: ROLE_USER
+        ROLE_EDITOR: ROLE_USER
+        ROLE_ADMIN:
+            - ROLE_MODERATOR
+        ROLE_SUPERADMIN:
+            - ROLE_ADMIN
+            - ROLE_EDITOR
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
-    access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+    access_control: # bin/console config:dump security access_control
+         - { path: ^/movie/latest, roles: [ROLE_EDITOR, ROLE_MODERATOR] }
+         - { path: ^/login, allow_if: "is_granted('ROLE_ADMIN') or 'is_anonymous()'" } # https://symfony.com/doc/current/security/expressions.html
