@@ -1,0 +1,1 @@
+php phpsql.phar sql --driver=sqlite --host=var/data.db
